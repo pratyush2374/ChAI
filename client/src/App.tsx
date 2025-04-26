@@ -5,6 +5,8 @@ import { AxiosError } from "axios";
 import { Toaster, toast } from "sonner";
 import { Search, Send, Sparkles, Loader2, Bot } from "lucide-react";
 import Footer from "./components/footer";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface FormData {
     question: string;
@@ -112,7 +114,9 @@ const App: React.FC = () => {
                         </div>
                         <div className="prose prose-invert max-w-none">
                             <p className="text-gray-300 whitespace-pre-wrap">
-                                {response.answer}
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {response.answer}
+                                </ReactMarkdown>
                             </p>
                         </div>
 
