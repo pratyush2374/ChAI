@@ -5,6 +5,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware  # 👈 new import
 from fastapi.responses import JSONResponse
 from configs import limiter
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 load_dotenv()
@@ -12,8 +13,18 @@ load_dotenv()
 # Attach limiter to app
 app.state.limiter = limiter
 
-# Add SlowAPI Middleware properly
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# SlowAPI Middleware
 app.add_middleware(SlowAPIMiddleware)
+
 
 # Global handler for when limit is exceeded
 @app.exception_handler(RateLimitExceeded)
@@ -23,8 +34,10 @@ async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
         content={"detail": "Rate limit exceeded. Try again later."},
     )
 
+
 # Routers
 app.include_router(router)
+
 
 @app.get("/health")
 def root():
