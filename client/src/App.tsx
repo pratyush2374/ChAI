@@ -69,7 +69,7 @@ const App: React.FC = () => {
                         <input
                             type="text"
                             placeholder="What would you like to know?"
-                            className="w-full pl-10 pr-20 py-4 rounded-lg bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                            className="text-[12px] md:text-base w-full pl-10 pr-20 py-4 rounded-lg bg-gray-900 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                             {...register("question", {
                                 required: "Please enter a question",
                                 maxLength: {
@@ -86,7 +86,7 @@ const App: React.FC = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="px-4 py-2 rounded-md bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="text-[12px] md:text-base px-4 py-2 rounded-md bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isSubmitting ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
