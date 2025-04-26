@@ -76,7 +76,7 @@ def fetch_answer(question: str) -> dict:
 
     # Filtering
     relevant_results = [doc for doc, score in results_with_score if score > 0.6]
-    
+
     if not relevant_results:
         return {
             "answer": "Invalid prompt, it seems your input is not related to the documentation.",
@@ -128,4 +128,6 @@ def fetch_answer(question: str) -> dict:
             "relevant_links": [],
         }
 
-    return structured_output
+    answer = structured_output["answer"]
+    relevant_links = list(set(structured_output["relevant_links"]))
+    return {"answer": answer, "relevant_links": relevant_links}
