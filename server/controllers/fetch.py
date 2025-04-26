@@ -38,75 +38,45 @@ class IndividualResponse(BaseModel):
     relevant_links: List[str]
 
 
-class HypotheticalResponse(BaseModel):
-    answer: str
-    is_query_valid: bool
-
-
 # Generate hypothetical answer
 def generate_hypothetical_answer(prompt: str) -> str:
-    system_prompt = system_prompt = """
-        You are a helpful AI assistant built to answer questions strictly related to the following documentation topics:
-
-        1. HTML
-        2. Git
-        3. C++
-        4. Django
-        5. SQL (including related databases like MySQL, PostgreSQL, etc.)
-        6. DevOps
+    system_prompt = (
+        system_prompt
+    ) = """
+        You are a helpful AI assistant built to answer user's questions strictly related to programming, coding and development topics.
 
         Context:
         - The documentation is authored by the YouTube channel 'Chai aur Code' to help students learn key development concepts.
-        - Use the style and tone of beginner-friendly explanations, similar to what's found in the documentation.
-
+    
         Your task:
         - Carefully analyze the user's question to detect the intent behind the words.
-        - Even if the question uses related terms (e.g., "PostgreSQL" for SQL or "CI/CD" for DevOps), consider it valid if it falls within the scope of the topics.
-
-        Validation Logic:
-        - If the question is related to the above topics (directly or through reasonable associations), return a clear and detailed answer. Set: `is_query_valid = true`.
-        - If the question is off-topic, vague, nonsensical, or not related to the documentation, respond with:
-        "Invalid prompt, it seems your input is not related to the documentation."
-        Set: `is_query_valid = false`.
-
-        Think before you respond. Your goal is to be helpful while staying on-topic with the documentation themes.
+        Think before you respond. Your goal is to be helpful while staying on-topic 
     """
-
-
 
     messages = [
         {"role": "system", "content": system_prompt},
         {"role": "user", "content": prompt},
     ]
 
-    response = client.beta.chat.completions.parse(
+    response = client.chat.completions.create(
         model="gemini-2.0-flash",
         messages=messages,
-        max_tokens=1111,
+        max_tokens=500,
         n=1,
-        response_format=HypotheticalResponse,
     )
 
-    res = response.choices[0].message.content
-    print(res)
-    return json.loads(res)
+    return response.choices[0].message.content
 
 
 # Fetch the final structured answer
 def fetch_answer(question: str) -> dict:
     hypo = generate_hypothetical_answer(question)
-    if not hypo["is_query_valid"]:
-        return {
-            "answer": "Invalid prompt, it seems your input is not related to the documentation.",
-            "relevant_links": [],
-        }
-    results_with_score = retriever.similarity_search_with_score(
-        query=hypo.get("answer"), k=7
-    )
 
-    # Only keep documents with a score below a threshold (e.g., 0.75)
-    relevant_results = [doc for doc, score in results_with_score if score < 0.75]
+    results_with_score = retriever.similarity_search_with_score(query=hypo, k=7)
 
+    # Filtering
+    relevant_results = [doc for doc, score in results_with_score if score > 0.6]
+    
     if not relevant_results:
         return {
             "answer": "Invalid prompt, it seems your input is not related to the documentation.",
@@ -133,6 +103,7 @@ def fetch_answer(question: str) -> dict:
         }
         2. Always return a list of relevant links in the format of [URL, URL, URL] if any relevant links are found.
         3. The final answer should be a well-structured, human-readable answer."
+        4. Use the style and tone of beginner-friendly explanations, similar to what's found in the documentation.
     """
 
     messages = [
