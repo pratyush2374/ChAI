@@ -14,7 +14,7 @@ class QuestionRequest(BaseModel):
 
 
 @router.post("/question")
-@limiter.limit("7/15minute")
+@limiter.limit("7/25minute")
 def question(request: Request, req: QuestionRequest):
     answer = fetch_answer(req.question)
     return {"data": answer}
